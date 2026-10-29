@@ -1,0 +1,8 @@
+\section[Projektbeschreibung]{Projektbeschreibung \myAuthor{Marvin Wolf}}
+\graphicspath{{sections/MARVINWOLF/images/}}
+
+Entwickelt wird ein Roboter, der ein gegebenes Puzzle automatisiert lösen soll. Dieser ist rein virtuell und basiert auf dem Robot Operating System (ROS).
+\newline Ein Puzzle der Größe 7x7 wird digitalisiert d.h. jedes einzelne Puzzleteil wird systematisch und möglichst einheitlich abfotografiert und in ein geeignetes Dateiformat umgewandelt. Dies ist ein manueller, einmaliger Prozess, der nicht automatisiert abläuft.
+\newline Auf Basis dieser Bilddateien wird nun die korrekte, einzigartige Lösung des Puzzles berechnet. Dabei werden verschiedene Eigenschaften wie die Abbildung auf den Puzzleteilen sowie deren Form miteinbezogen.
+\newline Ein KUKA KR6 Roboter soll die Lösung visualisieren. Dieser soll über das Szenegraph-System Coin3D visualisiert und animiert werden. Dementsprechend soll die Darstellung und Bewegung 3-dimensional erfolgen. Die Object-Files, über welche die 7 Komponenten des Roboters in Aussehen und Anordnung definiert werden, lagen bereits vor. Der virtuelle Roboter bewegt jedes Teil einzeln von einem fest definierten Ausgangspunkt an die jeweilige, der Puzzlelösung entsprechende Zielposition. 
+\newline Die Bewegung soll einer kontinuerlichen und abgerundeten Trajektorie folgen, welche durch die Neuanordnung der Roboterarme realisiert wird. Durch die Nutzung der Denavitt-Hartenberg-Repräsentation für die Anordnung der Koordinatensysteme der einzelnen Arme zueinander können Operationen wie Translation und Rotation über einfache Matrixberechnungen erfolgen. Die Robotics Toolbox von Peter Corke unterstützt bei anderen Aspekten der Roboterbewegung.

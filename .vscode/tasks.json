@@ -1,0 +1,68 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build ROS Package All",
+            "type": "shell",
+            "command": "colcon build",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },         {
+            "label": "Build ROS Package Digitalize",
+            "type": "shell",
+            "command": "colcon build --packages-select pkg_digitalize",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build ROS Package Control",
+            "type": "shell",
+            "command": "colcon build --packages-select pkg_control",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build ROS Package Solver",
+            "type": "shell",
+            "command": "colcon build --packages-select pkg_solver",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build ROS Package Visualizer",
+            "type": "shell",
+            "command": "colcon build --packages-select visualizer",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }]
+}

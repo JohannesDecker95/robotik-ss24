@@ -1,0 +1,15 @@
+# colcon
+build/
+install/
+log/
+
+# Python
+__pycache__/
+.pytest_cache/
+
+# Cache des Solvers (empfangene Teile und extrahierte Kanten), siehe README
+src/solver/images/
+
+# lokale Dateien
+.DS_Store
+.claude/

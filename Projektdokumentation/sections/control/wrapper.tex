@@ -1,0 +1,10 @@
+\subsection[Robotsbewegung-Wrapper]{Robotsbewegung-Wrapper \myAuthor{Chiara Piccolroaz}} \label{control/range}
+Wie in Abbildung \ref{fig:control_wrapper} gezeigt, sind die Algorithmen für die endgültige Roboterbewegung in einer Wrapper-Funktion zusammengefasst. Diese Funktion nimmt als Eingabe die Start- und Endtransformationsmatrix vom Solver-Team und leitet die interpolierten Gelenkkonfigurationen an das Visualisierungsteam weiter. Die Interpolation wird durch den oben dargestellten De-Casteljau-Algorithmus, den SLERP-Algorithmus und die inverse Kinematik umgesetzt. 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{wrapper.png}
+    \caption{Zweck und Inhalt von dem Robotsbewegung-Wrapper}
+    \label{fig:control_wrapper}
+\end{figure}
+ 

@@ -1,0 +1,25 @@
+\subsection[Berechnung des Greifbereichs]{Berechnung des Greifbereichs \myAuthor{Chiara Piccolroaz}} \label{control/range_}
+Das Ziel der Berechnung des Greifbereichs des Roboters ist es, das Solver-Team über die maximalen und minimalen x/y-Koordinaten für die Abhol- und Pickup-Positionen der einzelnen Puzzelteile zu informieren.
+
+Nämlich berechnet das Steuerungsteam anhand dieser Koordinaten die Bewegung des Roboters, die dann weiter an das Visualisierungsteam weitergeleitet wird. Sind diese Abhol- und Pickup-Punkte nicht erreichbar, so kann keine inverse Kinematik berechnet werden und keine Informationen an das Visualisierungsteam weitergegeben werden.
+\\
+\\
+Zum ersten wurden mittels der Methoden $checkreachabilityatBase()$ und $getmaxrange()$ in $robot.py$ die minimalen und maximalen Streckungen des Roboterarms berechnet, welche 0 cm und 1433 cm betragen (Figure \ref{fig:control_strecke}).
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{strecke.png}
+    \caption{Maximale Streckung des Roboterarms}
+    \label{fig:control_strecke}
+\end{figure}
+
+Mithilfe des Satzes des Pythagoras und trigonometrischen Funktionen wurde dann eine potenzielle maximale Fläche berechnet, innerhalb derer das fertige Puzzle optimal plaziert werden könnte (Figure \ref{fig:control_range}).
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{range.png}
+    \caption{Potenzielle maximale Fläche des fertigen Puzzles}
+    \label{fig:control_range}
+\end{figure}
+
+ 

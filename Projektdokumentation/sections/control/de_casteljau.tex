@@ -1,0 +1,44 @@
+\subsection[Interpolation der Bewegungskurve durch den Algorithmus von De Casteljau]{Interpolation der Bewegungskurve durch den Algorithmus von De Casteljau \myAuthor{Johannes Decker}}\label{control/de_casteljau}
+
+Im Allgemeinen dient der Algorithmus von De Casteljau dazu die Funktion für eine Kurve im Raum aufzustellen, welche sich an mindestens drei Punkten orientiert. Die Funktion interpoliert dabei zwischen allen gegebenen Punkten. Dabei stellen der erste und der letzte gegebene Punkt den Anfangs- und Endpunkt der interpolierten Kurve da. Alle weiteren gegebenen Punkte dienen lediglich zur Orientierung für die Kurve und liegen daher meist nicht auf der interpolierten Kurve. Im Rahmen dieses Projektes soll der Algorithmus von De Casteljau dazu dienen die translatorische Bewegung des Endeffektors geschmeidiger zu machen. Statt die Bewegung des Endeffektors aus mehreren linearen Bewegungen zwischen dem Anfangs- und End- sowie den Hilfspunkten zusammenzusetzen, siehe Figure \ref{fig:de_mot}, kann durch die Interpolation mit dem Algorithmus von De Casteljau eine kurvenförmige Bewegung erreicht werden.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{de_Motivation.png}
+    \caption{Beispielhafte Interpolation einer Kurve aus vier Punkten}
+    \label{fig:de_mot}
+\end{figure}
+
+Die translatorische Bahn des Endeffektors setzt sich dann aus beliebig vielen Teilabschnitten zusammen, welche durch die Funktion für die Interpolation aus dem Algorithmus von De Casteljau berechnet werden. In Figure \ref{fig:de_trans} ist die Interpolation der Transformationsmatrix $T$ vom Startpunkt einer Bewegung bis zu deren Endpunkt dargestellt. Dabei werden sowohl der Translationsvektor $p$ Als auch die Rotationsmatrix $R$ für jeden Teilschritt $i$ interpoliert.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{de_Transformation.png}
+    \caption{Interpolation des Translationsvektors $p$ von Startposition zur Endposition über beliebig viele Teilschritte $i$}
+    \label{fig:de_trans}
+\end{figure}
+
+Die Interpolation zwischen den gegebenen Punkten durch den Algorithmus von De Casteljau erfolgt dann in mehreren Stufen. Dabei wird in jeder Stufe erneut zwischen allen Punkten der vorherigen Stufe interpoliert, siehe Figure \ref{fig:de_vis}. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{de_visualisierung_final.png}
+    \caption{Interpolation zwischen den gegebenen Punkten $P_i$. Die Punkte $Q_i$ werden in der ersten Interpolationsstufe erzeugt, die Punkte $R_i$ in der zweiten, und der Punkt $S(t)$ in der dritten. Dabei stellt $S(t)$ einen beliegiben Punkt der interpolierten Kurve da. Dieses Beispiel ist angelehnt an \href{https://www.desmos.com/calculator/s78usaowv9?lang=de}{https://www.desmos.com/calculator/s78usaowv9?lang=de}.}
+    \label{fig:de_vis}
+\end{figure}
+
+Die Funktion für die Kurve der interpolierten Bewegung $S(t)$ ergibt sich dann aus den einzelnen Funktionen für die Interpolation zwischen zwei Punkten. Einzelne Punkte für die Funktion $S(t)$ können dann für beliebe Werte von $t$ berechnet werden, wobei $0 \leq t \leq 1$ sein muss. Dabei ist $S(0) = P_{Start}$, wobei in Figure \ref{fig:de_vis} $P_0 = P_{Start}$ und $S(1) = P_{Ende}$, wobei in Figure \ref{fig:de_vis} $P_3 = P_{Ende}$.
+
+\[
+\begin{aligned}
+& Q_0(t)=(1-t) P_0+t P_1; \quad Q_1(t)=(1-t) P_1+t P_2; \quad Q_2(t)=(1-t) P_2+t; P_3\\
+& R_1(t)=(1-t) Q_1(t)+t Q_2(t)=(1-t)^2 P_1+2 t(1-t) P_2+t^2 P_3 \\
+& R_0(t)=(1-t) Q_0(t)+t Q_1(t)=(1-t)^2 P_0+2 t(1-t) P_1+t^2 P_2 \\
+& S(t)=(1-t) R_0+t R_1=(1-t)^3 P_0+\left(3 t-6 t^2+3 t^3\right) P_1+3 t^2(1-t) P_2+t^3 P_3\\
+& wobei \quad 0 \leq t \leq 1
+\end{aligned}
+\]
+
+Die Interpolation der Bewegungskurve durch den Algorithmus von De Casteljau wurde in der Funktion \texttt{int\_pos\_casteliau} in \texttt{src/control/pkg\_control/pkg\_control/robot.py} implementiert. Die Funktion benötigt für die Interpolation Start- und Endpunkt der Bewegung und die Anzahl der Teilschritte, für welche die Punkte $S(t)$ auf der interpolierten Bewegungskurve berechnet werden sollen. Das Intervall von $t$ wird dabei auf die Anzahl der Teilschritte aufgeteilt, wodurch entsprechend viele Punkte $S_i(t_i)$ berechnet werden. Optional können beim Aufruf der Funktion \texttt{int\_pos\_casteliau} auch zwei Hilfspunkte angegeben werden, um die Form der interpolierten Bewegungskurve zu beeinflussen. Wenn auf die Angabe von Hilfspunkten verzichtet wird, berechnet die Funktion diese anhand von Start- und Endpunkt. Hierfür werden aus den X- und Y-Komponenten des Start- und Endpunktes Polarkoordinaten berechnet. Die Hilfspunkte besitzen dann jeweils denselben Winkel des korrespondierenden Punktes und liegen in einem fest definierten Radius vom Koordinatenursprung von 75cm in 35cm Höhe (also Z = 0,35). Für die Interpolation werden die Hilfspunkte dann wieder in kartesische Koordinaten umgerechnet. Anschließend erfolgt die Interpolation zwischen allen Punkten $P_i, Q_i$ und $R_i$ für alle $i$ um alle Punkte $S_i(t_i)$ zu erhalten, welche dann von der Funktion zurückgegeben werden.
+
+

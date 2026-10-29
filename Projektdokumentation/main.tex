@@ -1,0 +1,46 @@
+\documentclass{scrartcl}
+\usepackage{import}
+\usepackage{graphicx}
+\usepackage[style=ieee]{biblatex}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{todonotes}
+\usepackage{algorithm} 
+\usepackage{algpseudocode} 
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage[colorlinks=true, allcolors=black]{hyperref}
+\usepackage{tocbibind}
+\addbibresource{sources.bib}
+
+\newcommand{\myAuthor}[1]{
+    \hfill\text{\small[#1]}
+}
+
+\title{Projektdokumentation}
+\subtitle{Robotik - Sommersemester 2024\\Prof. Dr. Max Fischer}
+\date{Juni 2024}
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+
+\import{sections/MARVINWOLF}{section.tex}
+\import{sections/digitalize}{section.tex}
+\import{sections/solver}{main.tex}
+\import{sections/control}{main.tex}
+\import{sections/visualize}{section.tex}
+\import{sections/MARVINWOLF}{howto.tex}
+
+\printbibliography[heading=bibintoc,title=Literaturverzeichnis]
+\listoffigures
+
+\end{document}
+\pagenumbering{roman} / {arabic}

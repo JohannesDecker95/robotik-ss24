@@ -1,0 +1,23 @@
+\subsection{Roboterübersicht}\label{section:control_dh}
+Zu Beginn des Projektes arbeitete sich das gesamte Team in die Thematik der Robotik ein. Hierzu gehörten das Verstehen der zu verwendeten Toolbox und das eigenhändige aufstellen von DH Parametern nach modifizierten Standart.
+
+Implementiert wurde ein KUKA-KR6, dargestellt durch die folgenden modifizierten DH-Parameter.
+
+\begin{table}[ht]
+    \caption{modifizierte DH-Parameter}
+    \label{tab:control_dh}
+    \centering
+        \begin{tabular}{|c|c|c|c|c|}
+            \hline
+            \textbf{Link} & \textbf{a} & \textbf{$\alpha$} & \textbf{d} & \textbf{$\theta$} \\\hline 
+            1&0&$\pi$&-0,675&0\\ \hline
+            2 & 0,3 & $\frac{\pi}{2}$ &0 & 0 \\ \hline
+            3 & 0,65 & 0 & 0 &$-\frac{\pi}{2}$ \\ \hline
+            4 & 0,155 & $\frac{\pi}{2}$ & -0,6 & 0 \\ \hline
+            5 & 0 & $-\frac{\pi}{2}$ & 0 & 0 \\ \hline
+            6 & 0 & $-\frac{\pi}{2}$ & 0,1 & 0 \\ \hline
+        \end{tabular}
+\end{table}
+
+
+ 

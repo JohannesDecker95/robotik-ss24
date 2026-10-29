@@ -1,0 +1,62 @@
+\section[Projektdurchführung]{Projektdurchführung \myAuthor{Marvin Wolf}}
+\subsection{Organisation}
+Das Projekt wurde von den Teilnehmern des Kurses weitestgehend eigenverantwortlich durchgeführt. Die anfänglichen Vorgaben - Lastenheft - müssen erfüllt werden. Die Umsetzung ist den Studenten selbst überlassen. \\
+Auf die Ernennung eines Projektleiters folgte die Festlegung von Themengebieten und zugehörigen Aufgaben, die das Endprodukt definieren. Anhand dieser Gebiete wurden die Teams eingeteilt. Die Teams ”Digitalize”, ”Solve”, ”Control” und ”Visualize” entstanden sofort, während sich das Team ”Docker” spontan aus der Notwendigkeit einer gemeinsamen Entwicklungsumgebung und vorbildlicher Eigeninititative herausbildete. \\
+Mit den Teams wurden Arbeitspakete in Form von Epics gebildet, die die nächst anstehenden Schritte beschreiben. Diese waren auf eine Laufzeit von zwei bis vier Wochen ausgelegt.
+Die Terminierung wurde durch die beteiligten Studenten selbst festgelegt. Dadurch stieg das Interresse an einer rechtzeitigen Fertigstellung. \\ Die Projektmethodik ist auch den Gruppen überlassen. Wie in der Softwareentwicklung üblich folgten die Teams agilen Methoden wie Scrum.
+Jede Woche gab es zusätzlich ein Meeting, in dem alle Teams persönlich antraten um sich und den Stakeholder auf den aktuellen Stand brachten. So konnte der Auftraggeber nach dem Prinzip ”Continuous Feedback” Einfluss nehmen und seine Erfahrung in dem Bereich einbringen. Die persönliche Kommunikation und Zusammenarbeit zwischen den Gruppen steigerte merkbar die Effizienz und war für den Erfolg des Projektes unabdingbar. Interne Kommunikation und Absprachen in den Gruppen über Discord haben allerdings gut funktioniert.
+
+\subsection{Projektleitende Tätigkeiten}
+\subsubsection{Allgemein}
+
+Der Projektleiter agierte in enger Absprache mit dem Kunden. Er ist verantwortlich, den Fortschritt des Projektes zu überwachen und einzugreifen, falls der Zeitplan in Gefahr gerät. Außerdem sorgt er dafür, dass die Stakeholder in geeigneter Form den Fortschritt des Projektes verfolgen können. \\
+Folgende Methoden wurden u.A. zur Umsetzung angewandt: \\
+\begin{itemize}
+    \item Regelmäßige Besprechungen mit den Teams und Einholen vom aktuellen Stand, Workload und Problemen.
+    \item Aufbereiten und Visualisieren dieser Informationen für Stakeholder.
+    \item Risikoanalyse mit den Gruppen. Beurteilung und Einordnung dieser sowie Darstellung in Form einer Risikomatrix, um anfängliche Risiken und Befürchtungen der Studenten einzuschätzen und einzudämmen.
+    \item Planen des Vorgehens:\\
+            Anfänglich aufteilen der zu implementierenden Komponente in grobe TODOs und Schätzen des Aufwandes über Zeitleiste. Danach genauere Terminierung über Epics mit Enddatum festlegen.\\ Es wurden mit den Teams neue Epics geplant, wenn die alten abgeschlossen waren. So konnte die Durchführung des Projekts agil und dynamisch stattfinden. Die aus den Epics resultierende Roadmap (Gitlab-Feature) kann als Gantt-Diagramm betrachtet werden und eignet sich hervorragend als Visualisierung für die Stakeholder.
+    \item Umverteilung der ”Mitarbeiter” dynamisch nach Workload und Bedarf.
+    \item Festlegung von Terminen und Planung des Ablaufs.
+    \item Definition von Teilintegrationen d.h. Szenarien, die einzelne Abläufe des Gesamtprojekts darstellen. Dadurch wurden relevante Schnittstellen zwischen mehreren Nodes getestet. Die Komplexität einzelne Komponenten aneindanderzufügen ist deutlich geringer als alle auf einmal zu einem Produkt zu integrieren.  
+    \item Festlegen von Standards um gemeinsame Arbeit mit 18 Personen zu ermöglichen. Z.B. bei der Planung der Projektdokumentation- und Präsentation.
+\end{itemize}
+
+\subsubsection{Top-Down Bottom-Up}
+Aufgrund der Unerfahrenheit des Projektleiters ist eine Mischung der Managementtheorien ”Top-Down” und ”Bottom-Up” praktiziert worden. Die Initiative bei der Gestaltung und Ausführung neuer Projektabschnitte ging vom Projektleiter aus, welcher ausgearbeitete Vorschläge und Ideen initial einbringt. Diese wurden dann von den Studenten, die sich in ihren Teilgebieten besser auskennen und evtl. auch in organisatorischen Bereichen bereits Erfahrung gemacht haben, entweder allgemein akzeptiert oder verbessert und damit optimiert. Manchmal musste trotzdem gegen den Willen der Studenten entschieden werden, um die Komplexität nicht unnötig zu erhöhen oder damit einhergehende Risiken auszuschließen. Durch den Ansatz, ”Top-Down” und ”Bottom-Up” zu mischen, konnte das Projekt erst gelingen. So wurden Kompetenzen richtig ausgelagert und gleichzeitig Motivation geschaffen, indem jeder Stimme Beachtung geschenkt wurde und so gemeinsam das Projekt gelenkt werden konnte. Die Mischung der Strategien wird auch als ”bipolare Strategie” bezeichnet. \cite{top_down-bottom_up}\newline
+Rein der Ansatz ”Top-Down” wurde nur beim Konziperen der Projektdokumentation verwendet. Hierbei wurde den Studenten vom Projektleiter vorgestellt, was eine Projektdokumentation ist, welchen Zweck dies erfüllt, wie sie aufgebaut ist und was für Fehler in Zusammenhang mit dieser auftreten können.\\ Es wurden alle möglichen Bestandteile einer Projektdokumentation aufgelistet:
+\begin{enumerate}
+    \item Projektvorfeld (IST-Analyse)
+    \item Aufgabenstellung (SOLL-Konzept) / Anforderungen
+    \item Projektziele (SOLL-IST-VERGLEICH)
+    \item Zeitplanung / Meilensteine
+    \item Wirtschaftlichkeit
+    \item Projektverlauf
+    \item Ausblick / Folgeaktivitäten
+    \item Pflichtenheft
+    \item Angebot
+    \item Preiskalkulation / Nutzwertanalyse
+    \item Kundeneinweisung
+    \item Abnahme- und Testprotokoll
+    \item Rechnung
+\end{enumerate}
+Nach dem Top-Down Ansatz im Sinne der Modellierung wurde so von oben mit den allgemeinen Punkten angefangen. Der Überbegriff Projektdokumentation wurde in seine Bestandteile heruntergebrochen. Diese werden nun weiter verfeinert. Zuerst werden alle für unser Projekt nicht relevanten Bestandteile entfernt. Z.B. entfällt die IST-Analyse, da bisher kein System bestand und von Null auf entwickelt werden muss. Außerdem handelt es sich um ein einmaliges wissenschaftliches Projekt, welches keinen wirtschaftlichen Zwecke folgt.\\Damit entfällt bereits ein Großteil der Inhalte. Folgende bleiben übrig:
+\begin{enumerate}
+    \item Aufgabenstellung (SOLL-Konzept) / Anforderungen
+    \item Zeitplanung / Meilensteine
+    \item Projektverlauf
+    \item Kundeneinweisung
+    \item Abnahme- und Testprotokoll
+\end{enumerate}
+Nun wird geprüft welche Teile bereits (in einer anderen Form) vorhanden sind. Das SOLL-Konzept ist in Form von Anforderungen bereits im Vorhinein vom Auftraggeber definiert. Die Zeitplanung sowie der grobe Projektverlauf sind bereits als von Gitlab-Wiki Dokumentation oder Epics und der Gitlab Roadmap vorhanden. Diese Informationen wurden vom Projektleiter erfasst, aufbereitet und in die Dokumentation eingepflegt.\\
+Die verbleibenden zwei Komponenten werden in anderer Form verwirklicht. Die Kundeneinweisung findet als  Abschlusspräsentation statt während das Abnahme- und Testprotokoll bereits während des Projekts im Zuge von ”Continuous Feedback” durchgeführt wurde.\\
+Damit ist das Projekt an sich nach Definition bereits dokumentiert. Sinnvoll ist es aber bei einem Softwareentwicklungsprojekt auch diese zu dokumentieren. Eine Technische Dokumentation zur Übergabe an den Kunden muss verfasst werden, damit dieser das Projekt weiterentwickeln oder warten kann.\\
+Somit müssen von den Studenten nur noch der individuelle Projektverlauf sowie die technische Dokumentation niedergeschrieben werden.
+\begin{itemize}
+    \item Was war das zu lösende Problem?
+    \item Was habe ich gemacht?
+    \item Welche Lösungen / Techniken habe ich angewendet?
+    \item Genauere Beschreibung der Lösung / Implementation
+\end{itemize}
+Das genaue Verfassen in Latex wurde vom Projektleiter vorgeschrieben und nur vom Stakeholder beeinflusst, was auch wieder dem Top-Down Ansatz entspricht.

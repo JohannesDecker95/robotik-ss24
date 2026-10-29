@@ -1,0 +1,130 @@
+% \subsubsection[control/arch]{Architektur der Control-Node}
+\subsection{Architektur der Control-Node}\label{control/arch}
+Zur Implementierung der Roboterfunktionen wurde die folgende Klasse und Funktionen umgesetzt:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{class_diagram.png.png}
+    \caption{Klassendiagramm der Control Node.}
+    \label{fig:class}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{class KukaKr6}
+    \begin{itemize}
+        \item \texttt{init}: class initialization
+        \item \texttt{plot}: plots the robot using \href{https://matplotlib.org}{matplotlib} as a static image
+        \item \texttt{get\_position}: returns the current position (x, y, z) of the end-effector
+        \item \texttt{set\_position}: sets the current position (x, y, z) of the end-effector
+        \item \texttt{plot\_gif}: plots the robot's movement using \href{https://matplotlib.org}{matplotlib} as a gif
+        \item \texttt{fkine}: forward kinematics for the robot (using the toolbox implementation)
+        \item \texttt{ikine}: \href{Inverse-Kinematic}{inverse kinematics} (using Newton-Raphson)
+        \item \texttt{move\_linear}: moves the robot in a straight line from start to end pose
+        \item \texttt{base\_collision}: Kollision mit Basis
+        \item \texttt{check\_reachability\_at\_base}: checks whether the base of the robot is reachable
+        \item \texttt{get\_max\_range}:Range-Calculation
+        \item \texttt{interpolate\_from\_to}: a wrapper function for multiple movement algorithms that can be chosen via the function's parameters
+        \begin{itemize}
+            \item \texttt{int\_pos\_linear}: linear interpolation of the position
+            \item \texttt{int\_pos\_casteliau}: interpolation using De Casteljau
+            \item \texttt{int\_rot\_slerpQuad}: interpolate rotation using SLERP
+        \end{itemize}
+        \item \texttt{calculate\_joints}: calculates joint configurations in radians
+    \end{itemize}
+    \item \textbf{class Position}: describes x, y, z positioning
+\end{itemize}
+
+
+\subsection[ROS2 Integration]{ROS2 Integration \myAuthor{Sami Hamza, Pascal Severin, Chiara Piccolroaz}}
+
+\subsubsection{Aufgaben}
+Die wesentliche Aufgabe der ROS2-Implementierung ist das Empfangen der Nextpiece-Message auf dem Topic ``solver/nextpiece'', welches die anzusteuernde Pickup- und Endpositionen beinhaltet. Aus diesen Positionen soll dann eine Trajektorie berechnet werden und die ermittelten Gelenkkonfigurationen an die Visualizer-Node über das Topic ``control/angles'' geschickt werden. Zudem muss die Control-Node die Solver-Node über das Platzieren eines Puzzleteils informieren, damit diese die nächsten Start- und Endpositionen bereitstellen kann. Dafür soll das Topic ``solver/puzzlebool'' verwendet werden.
+
+\paragraph{Schnittstellen}
+\autoref{fig:topics} gibt eine über die verwendeten Schnittstellen aus Sicht der Control-Node.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Topics.png}
+    \caption{ROS2-Schnittstellen Übersicht.}
+    \label{fig:topics}
+\end{figure}
+
+\paragraph{Control - Solver}
+Die Solver-Node übermittelt der Control-Node mit dieser Schnittstelle die Pickup- (Spawn-Punkt) und die Zielposition der Puzzleteile. Es handelt sich hierbei Control-seitig um einen einfachen Subscriber, der Nachrichten des in geometry\_msgs von ROS vordefinierten Nachrichtentyps \textit{PoseArray} vom Topic ``solver/startpos'' subscribed. Diese Nachricht enthält ein Array aus ROS-Poses, welche durch eine Position und eine Orientierung als Quaternion im Robotersystem (Einheit Meter) definiert sind.
+
+\paragraph{Control - Visualize} Hierbei handelt es sich um einen Publisher auf das Topic ``control/angles'', bei dem die Control-Node die Gelenkkonfigurationen, sowie die Information, ob ein Teil gegriffen wird published. Dafür wird die eigens definierte \textit{Angles}-Nachricht verwendet (Nachrichtendefinition siehe \autoref{lst:Angles}). Die Gelenkkonfiguration wird als \textit{std\_msgs/Float64MultiArray} übertragen. Die Information, ob ein Puzzleteil gegriffen wird, wird über den Boolean \textit{picked} übermittelt. Die Piece-ID des Teils steckt in dem 32-Bit Integer \textit{id}, jedoch wird von diesem Anteil kein Gebrauch gemacht. 
+
+\begin{lstlisting}[language=Python, caption={Nachrichten Definition für die Nachrit Angles},label=lst:Angles]
+# angle data
+std_msgs/Float64MultiArray angles
+# boolean to indicate if puzzle piece is picked up or not
+bool picked
+# id of the puzzle piece
+int32 id
+
+\end{lstlisting}
+
+Um dem Solver zu signalisieren, dass das Puzzleteil platziert wurden und das nächste Teil gesendet werde kann, wird ein Publisher auf das Topic ``control/puzzlebool'' registriert. Dieser published eine \textit{PuzzleBoolean}-Nachricht, sobald sich der Greifstatus ändert (Nachrichtendefinition siehe \autoref{lst:puzzleboolean}). Der Greifstatus wird über den Boolean \textit{data} transportiert. Der string \textit{id}, der die Piece-ID des aktuell transportierten Teils beinhaltet, wird hier ebenfalls nicht verwendet.
+\begin{lstlisting}[language=Python, caption={Nachrichten Definition für die Nachricht PuzzleBoolean},label=lst:puzzleboolean]
+# toggle-data for a puzzle piece
+bool data
+# id of the specific piece
+string id
+\end{lstlisting}
+
+ 
+\subsubsection{Node - Ablauf}
+Um die gesamten Aufgaben zu erfüllen, wird im Rahmen des Projektes ein monolithischer Ansatz gewählt. Dieser bietet sich an, da die Aufgaben sehr gut auf Callback-Funktionen einer ROS-Node aufgeteilt werden können. In \autoref{fig:sequence} ist der sequenzielle Ablauf der Control Node-Callbacks dargestellt. 
+\begin{enumerate}
+    \item Der `main-Thread'' main-Node dient als warte-Thread falls grade keine Callback aktiv ist.
+    \item Falls eine Nextpiece-Message empfangen wird (Event $E_1$), wird in die \textit{nextpiece\_callback}-Funktion gesprungen. In dieser werden einzelne Trajektorienabschnitte berechnet. Diese folgen stets dem Schema: Start- zu Pickup-Position; Pickup- zu Startposition; Start- zu Zielposition; Ziel- zu Startposition. Nach jeder Berechnung der Teiltrajektorien wird der ein Timer aktiviert (Event $E_2$).
+    \item Wurde der Timer aktiviert, wird bei jedem Timerevent in die \textit{visualize\_timer\_callback}-Funktion gesprungen und die Gelenkkonfigurationen 
+    auf das Topic ``control/angles'' gepublished. Die \textit{nextpiece\_callback}-Funktion ist so lange blockiert, bis die Trajektorie versendet wurde (Event $E_3$).
+    \item Ist die Trajektorie versendet, wird die sie als kritische Ressource wieder freigegeben und die \textit{nextpiece\_callback}-Funktion fortgesetzt. Wurde die Pickup- bzw. Zielposition erreicht wird zusätzlich noch in das Topic ``control/puzzlebool'' gepublished.
+\end{enumerate}
+
+\textbf{Anmerkung}: In ROS müssen die Eigenschaften und Rechte von Callbacks über sogenannte Callbackgroups geregelt werden. Da in diesem Fall die \textit{visualize\_timer\_callback}-Funktion die \textit{nextpiece\_callback}-Funktion unterbricht, müssen sich diese in unterschiedlichen Callback-Gruppen befinden. Hier werden die Callbacks zwei Mutually Exclusive Callback Groups zugeornet. Damit haben diese die Berechtigung sich gegenseitig zu unterbrechen.
+     
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]
+    {sequence_threads.png}
+    \caption{Sequenzbeispiel zur Veranschaulichung der Callback-Interaktion.}
+    \label{fig:sequence}
+\end{figure}
+
+\subsubsection{Schnittstellentests}
+Im Rahmen des Projekts wurden jeweils in Zusammenarbeit mit den anderen Teams Integrationstests durchgeführt. Hierfür wurden Teilfunktionalitäten manuell durch Starten der betroffenen Nodes bzw. der eingeführten Tester-Nodes über ROS-Launchfiles auf Richtigkeit überprüft.
+
+
+\lstset{
+  language=bash,
+  basicstyle=\ttfamily
+}
+
+\subsubsection{Fazit}
+Die Funktionalität im ROS-System ist gewährleistet. Allerdings könnten hier die Nachrichtendefinitionen überarbeitet werden, um beispielsweise unverwendete Nachrichtenfelder zu verwerfen.
+
+%Der \textit{Control} Node übernimmt die Steuerung des Roboters.
+
+%Er ist folgendermasen aufgebaut (vgl.: \ref{fig:control_component}):
+
+
+%\begin{table}[ht]
+%    \caption{Übersicht der Control-Node Komponenten}
+%    \label{tab:control_arch}
+%    \centering
+%    \resizebox{\textwidth}{!}{
+%        \begin{tabular}{ll}
+%            \textbf{Control} & Die ROS Implementierung der Roboterbewegung \\
+%            \textbf{Control/Robot} & Model des Roboters (KUKA-KR6), beschrieben durch DH-parameter \\
+%            \textbf{Control/MotionControl} & Implementierung der Inversen Kinematik und Interpolationen der Roboterbewegung \\
+%            \textbf{Control/TestVisualisierung} & Implementiert eine einfache Darstellung des Roboters, unter Verwendung von \textit{matplotlib} \\
+%            \textbf{Control/TesterNode} & ROS Node zur Simulierung von Solver-Nachrichten \\
+%            \textbf{Visualisierung} & ROS Visualisierungsnode \\
+%            \textbf{Solver} & ROS Puzzlelösnode \\
+%        \end{tabular}}
+%\end{table}
+
+

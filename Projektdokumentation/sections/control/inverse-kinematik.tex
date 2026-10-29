@@ -1,0 +1,115 @@
+\subsection[Inverse Kinematik]{Inverse Kinematik \myAuthor{Sami Hamza, Pascal Severin}}
+Das Ziel der Inversen Kinematik ist es die Emittlung der Abbildung $IK$ einer gewünschten End-Effektor Pose $T_e \in SE3$ auf die Gelenkkonfiguration $q$ eines Roboters mit $n$-DoF. 
+\begin{gather}
+    IK : SE3 \to \mathbb{R}^n \nonumber \\
+    IK : T_e \mapsto q
+\end{gather}
+Dies entspricht der inversen Abbildung der Vorwärtskinematik $FK$, welche die Gelenkkonfiguration auf die Gelenkkonfiguration $q$ auf die Endeffektorpose $T_e$ abbildet. Die Pose ergibt sich hier durch Einsetzen der Konfiguration in die aus den DH-Parametern hergeleitete, parametrisierte Transformation.
+\begin{gather}
+    FK : \mathbb{R}^n \to SE3 \nonumber \\
+    FK : q \mapsto T_e 
+\end{gather}
+
+
+Es wurden diese zwei Arten der inversen Kinematik implementiert:
+
+\paragraph{Numerische Inverse Kinematik}
+Die numerische Kinematik versucht das inverse Kinematik Problem durch numerische Optimierungsverfahren zu lösen, anstatt analytische Lösungen zu berechnen. Numerische Optimierung erweist sich zwar als weniger performant, erlaubt jedoch die Berücksichtigung von Gelenkwinkellimitierungen, maximierung der Manipulativität und weiterer Randbedingungnen. Zudem wird der Lösungsraum implizit eingegrenzt, da i.d.R. das Optimum ausgehend von einer Startkonfiguration $q_0$ bzw. Start-End-Effektor Pose $T_ep$ gefunden wird.
+
+Im Allgemeinen versucht die numerische inverse Kinematik eine Fehlerfunktion $E \in \mathbb{R}_+$ zu minimieren. Diese wird berechnet durch:
+
+\begin{equation}
+    E=\frac{1}{2}e^TWe
+\end{equation}
+wobei $e \in \mathbb{R}^6$ ein Maß für die Abweichung der Pose $T_e$ von der Zielpose $T_ep$ darstellt und $W$ ein diagonal Matirx zur Gewichtung dieses Fehlers darstellt $W = diag(w), w \in \mathbb{R}^6$.
+\begin{gather}
+    e=
+    \begin{bmatrix} 
+    \tau(T_{ep}) - \tau(T_{e})\\
+    \alpha(\rho(T_{ep}) \rho(T_{e}^T))
+    \end{bmatrix} 
+\end{gather}
+Hierbei extrahiert $\tau$ den Positionsvektor $t \in \mathbb{R}^3$ und $\rho$ die Orientierung als Rotationsmatirx $R \in SO3$ aus homogenen Matrizen. Zusätzlich wird die resultierende Fehlerrotation $\rho(T_{ep}) \rho(T_{e}^T)$ durch die Abbildung $\alpha: R \in SO3 \mapsto v \mathbb{R}^3$ als Eulervector parametrisiert. Die Definition von $\alpha$ kann \cite{corke2024} entnommen werden.\\
+
+Zur Optimierung der Fehlerfunktion stehen verschiedene Verfahren zu Verfügung. Im Projekt wurde die Newton-Raphson-Methode implementiert, da es sich hierbei um eine einfache und anschauliche Methode handelt. Die Newton-Raphson-Methode versucht eine Gelenkkonfiguration so lange zu aktualisieren bis die Fehlerfunktion $E$ kleiner als ein geggebener Schwellenwert $\epsilon_E$ ist. Die Update-Gleichung lässt sich wie folgt formulieren
+\begin{equation}
+    q_{k+1} = q_{k} + J(q_{k})^{-1} e_k
+\end{equation}
+$J \in \mathbb{R}^{6xn}$ beschreibt hierbei die Jakobimatrix bei gegebener Konfiguration $q_k$. Es ist üblich die Pseudo-Inverse $J^+$ der Jakobimatrix zu verwenden, da diese effizient über die Singular Value Decomposition (SVD) berechnet werden kann. Außerdem ermöglicht diese die Betrachtung von redundanten Robotern (DoF > 6) und gibt den Update-Schritt zurück, der mit am wenigsten Gelenkaufwand realisiert werden kann. Auch im Falle von Singularitäten wird der bestmögliche Update-Schritt berechnet.
+
+\begin{equation}
+q_{k+1} = q_{k} + J(q_{k})^{+} e_k
+\end{equation}
+
+Diese Methode ist einfach zu implementieren, aber nicht die robusteste Lösung. Sie neigt dazu für ungünstige Startkonfigurationen nicht zu konvergieren. Robustheit kann durch einen Wechsel zu komplexeren, numerischen Methoden wie der Gaus-Newton- oder der Levenberg-Marquard-Methode, die dieses Problem berücksichtigen, hinzugefügt werden
+\cite{corke2024}\cite{Arteaga2022}\cite{corke2020}. Allerdings erweist sich die genannte Methode im Rahmen dieses Projektes als ausreichend für die Lösungsfindung. Es sei jedoch angemerkt, dass keine Gelenkwinkel und Kollisionschecks durchgeführt werden, weswegen die implementierte Funktion nur in einer Simulation verwendet werden kann.
+
+\paragraph{Analytische Inverse Kinematik}
+Die grafische (oder analytische) Inverse Kinematik ist in zwei Unteraufgaben aufgeteilt:
+\begin{itemize}
+    \item Inveres Positionierungsproblem
+    \item Inverses Orientierungsproblem
+\end{itemize}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.75\textwidth]{manipulator.png}
+    \caption{Manipulatoren des KUKA-KR6 Roboters}
+    \label{fig:control_manip}
+\end{figure}
+
+Um die inverse Positionierung eines 6DoF-Manipulators\footnote{\textit{6 degree of motion} bezieht sich auf die Freiheitsgrade eines Roboters. Besitzt dieser (wie hier vorhanden) 6 Gelenkachsen, so hat er insegsamt 6 Freiheitsgrade}
+zu berechnen, muss folgendes vorrausgesetzt werden. Der Roboter lässt sich in jeweils 3-Achsen Manipulatoren teilen, wobei die vorderen drei Gelenke alleinig die Position des Endeffektors bestimmen und die restlichen drei seine Orientierung.
+Diese Manipulatoren sind in \ref{fig:control_manip} aufgezeigt. Die Längen der Glieder des \textit{Sphärichen Gelenkes (spherical wrist)} sollten für diese Berechnung möglichst klein sein.
+
+Der erste Schritt besteht in der Berechnung der Position unseres \textit{Spärischen Gelenkes}, positioniert in dem vierten Gelenk des Roboters. Da wir, wie in den DH-Parametern in \ref{tab:control_dh} beschrieben.
+Da die Distanz zwischen den vierten und fünften Glied unseres Roboters nicht null ist müssen wir diese als einen Offset in Z-Richtung berücksichtigen: 
+
+\begin{equation}
+    P_{wrist} = P_{end}-offset\cdot\vec{direction} = P_{end} - 0.155\cdot \vec{Z_{end}}
+\end{equation}
+
+Wir beginnen damit die ersten drei Winkel zu berechnen. Hierfür wird der Roboter schmatisch von der Seite und von oben aufgezeichnet, wie in \ref{fig:control_tsview} ersichtlich.
+Unter Verwendung von verschiedenen geometrischen Rechensätzen (wie Sinus- und Kosinussätze, Satz des Pythagoras, etc.) erhalten wir diese Ergebnisse.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.75\textwidth]{ts_view.png}
+    \caption{schematische Darstellungen}
+    \label{fig:control_tsview}
+\end{figure}
+
+\begin{equation}
+     \theta_{1} = \tan^{-1}\left( \frac{Y}{X} \right) \\
+     \theta_{2} = \cos^{-1}\left( \frac{s^2-r^2x^2}{2rx} \right) - \cos^{-1}\left( \frac{t^2-a_{3}^2x^2}{2a_{3}x} \right) \\
+    \theta_{3} = 180 - \cos^{-1}\left( \frac{x^2-t^2a_{3}^2}{2ta_{3}} \right) \\
+\end{equation}
+
+
+
+Zur Berechnung der Inversen Orientierung betrachten wir die Orientierungsmatrizen der letzten drei Gelenke:
+
+
+\begin{equation}
+    \resizebox{\textwidth}{!}{%
+         $
+         R_6^3 = \begin{bmatrix}
+        \cos(q4) \cdot \cos(q5) \cdot \cos(q6) - \sin(q4) \cdot \sin(q6) & -\cos(q6) \cdot \sin(q4) - \cos(q4) \cdot \cos(q5) \cdot \sin(q6) & -\cos(q4) \cdot \sin(q5) \\
+        \cos(q4) \cdot \sin(q6) + \cos(q5) \cdot \cos(q6) \cdot \sin(q4) & \cos(q4) \cdot \cos(q6) - \cos(q5) \cdot \sin(q4) \cdot \sin(q6) & -\sin(q4) \cdot \sin(q5) \\
+        \cos(q6) \cdot \sin(q5) & -\sin(q5) \cdot \sin(q6) & \cos(q5)
+    \end{bmatrix}
+         $
+    }
+\end{equation}
+
+Mit dieser Matrix und der gewünschten End-Rotierung können die letzten drei Winkel berechnet werden:
+
+\begin{equation}
+\theta_{1} = \tan^{-1}\left( \frac{Y}{X} \right)
+\theta_{2} = \cos^{-1}\left( \frac{s^2-r^2x^2}{2rx} \right) - \cos^{-1}\left( \frac{t^2-a_{3}^2x^2}{2a_{3}x} \right)
+\theta_{3} = 180 - \cos^{-1}\left( \frac{x^2-t^2a_{3}^2}{2ta_{3}} \right)
+\end{equation}
+\cite{robogrok}\cite{iklecture}
+
+
+

@@ -1,0 +1,25 @@
+# Startet die Entwicklungsumgebung ohne VS Code (für Linux mit X11).
+# Aufruf aus diesem Ordner:  docker compose up -d --build
+# Danach:                    docker exec -it ros2-humble-devcontainer zsh
+services:
+  ros2_humble:
+    container_name: ros2-humble-devcontainer
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    restart: always
+    privileged: true
+    # Container am Leben halten; gearbeitet wird per docker exec.
+    command: sleep infinity
+    working_dir: /home/vscode/workspace
+    environment:
+      - DISPLAY=$DISPLAY
+      - QT_X11_NO_MITSHM=1
+      - LIBGL_ALWAYS_INDIRECT=0
+      - ROS_DOMAIN_ID=42
+    volumes:
+    # Workspace Folder
+      - ../../../:/home/vscode/workspace
+    # For the X-Server
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    network_mode: host

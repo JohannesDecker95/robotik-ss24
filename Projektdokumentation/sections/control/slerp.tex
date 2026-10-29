@@ -1,0 +1,53 @@
+\subsection[SLERP - Spherical Linear Interpolation]{SLERP - Spherical Linear Interpolation \myAuthor{Chiara Piccolroaz}} \label{control/slerp}
+
+Ziel des SLERP-Algorithmus ist es, eine sanfte Rotation des Roboterkopfs von einer Startorientierung zur Zielorientierung zu ermöglichen. Dies ist wichtig, um unerwünschte (visuell uninteressante oder unrealistische) Rotationen zu vermeiden.
+\\
+\\
+Im Fokus stehen die sogenannten Frame-Rotationen. Bei der Rahmenrotation ist der betrachtete Punkt statisch, während sich das Koordinatensystem bewegt.
+
+Aus Performance- und Robustheitsgründen verwendet der Code Hilfsfunktionen aus dem Python-Package \texttt{scipy.spatial.transform}, das auf Quaternionen basiert. Diese stellen eine Möglichkeit zur Darstellung von Rotationen dar, neben anderen wie der Rotationsmatrix, den Euler-Winkeln und der Axis-Angle-Darstellung. 
+
+Im Vergleich zu diesen bieten Quaternionen einige Vorteile. Erstens ermöglichen sie eine kompakte Darstellung von Rotationen mit nur vier Werten, was den Rechenaufwand reduziert und schnellere Berechnungen ermöglicht. Zudem tritt kein Gimbal Lock auf, eine unerwünschte Dimensionreduzierung bei der Verwendung von Euler-Winkeln, die die Bewegungsfreiheit einschränkt. Schließlich erlauben Quaternionen eine einfache und kontinuierliche Interpolation zwischen zwei Rotationen, wie sie der SLERP-Algorithmus ermöglicht.
+\\
+\\
+SLERP steht für Spherical Linear Interpolation und wird zur Interpolation zwischen zwei Punkten auf einer Kugel, \( p0 \) und \( p1 \), verwendet.
+
+Der geometrische SLERP setzt voraus, dass jeder Punkt auf einer Kurve eine lineare Kombination seines Start- und Endpunkts ist, wie in der unten gezeigten Formel und Abbildung dargestellt (Figure \ref{fig:control_slerp_geo}).
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{slerp_geo.png}
+    \caption{Formel und Skizze für den geometrischen SLERP}
+    \label{fig:control_slerp_geo}
+\end{figure}
+
+Der Quaternionen-SLERP basiert auf demselben Prinzip. Gegeben sind die Anfangsorientierung \( Os \), die Zielorientierung \( Oe \) und ein Zeitparameter \( t\). Es wird ein Weg zwischen zwei Orientierungen interpoliert, der die kürzeste Bewegung auf einem Großkreisbogen darstellt (Figure \ref{fig:control_slerp_quat}).
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{slerp_quat.png}
+    \caption{Skizze für den geometrischen SLERP}
+    \label{fig:control_slerp_quat}
+\end{figure}
+
+Da die Darstellung und Implementierung von Quaternionen eher komplex ist, haben wir uns in diesem Projekt entschieden, alternative Methoden für die Rotationsinterpolation zu testen. So wurde die Axis-Winkel-Darstellung genutzt, deren Schritte hier zusammengefasst werden (Figure \ref{fig:control_slerp_impl}):
+\\
+1. Rotationsmatrizen \( R_{s} \) und \( R_{e} \) aus den Transformationsmatrizen \( T_{s} \) und \( T_{e} \) extrahieren.
+\\
+2. Rotationsmatrix \( R_{se} \) von \( R_{s} \) finden: \( R_{se} \) = inv \( R_{s} \) *  \( R_{e} \)
+\\ 
+3. Axis-Winkel-Darstellung aus Rse rekonstruieren
+\\
+4. Winkel von 0 bis $\theta$ linear interpolieren.
+\\
+5. Rotationsmatrizen aus der Axis-Winkel-Darstellung rekonstruieren.
+\\
+6. Transformationsmatrizen aus den Rotationsmatrizen und Positionen rekonstruieren.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{slerp_impl.png}
+    \caption{Skizze der wichtigsten Implementierungsschritte (2. und 3.)}
+    \label{fig:control_slerp_impl}
+\end{figure}
+

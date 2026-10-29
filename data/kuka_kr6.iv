@@ -1,0 +1,224 @@
+#Inventor V2.1 ascii
+
+Separator {
+  # Base #######################################################
+  Separator {
+    DEF kr6_base File {
+      name "kr6_base.iv"
+    }
+  }
+
+  # DH Translation
+  RotationXYZ {
+		axis X
+    angle 3.141592653589793
+	}
+
+  Translation{
+    translation 0 0 -675
+  }
+
+  # Animation
+  DEF kr6_base_animate RotationXYZ {
+		axis Z
+    angle 0
+	}
+
+  # Arm 1 #######################################################
+  Separator {
+    RotationXYZ {
+      axis X
+      angle 3.141592653589793
+    }
+
+    Translation{
+      translation 0 0 -675
+    }
+
+    DEF kr6_arm1 File {
+      name "kr6_arm1.iv"
+
+    }
+  }
+
+  # DH Translation
+  RotationXYZ {
+		axis X
+    angle 1.5707963267948966
+	}
+
+  Translation{
+    translation 300 0 0
+  }
+
+  # Animation
+  DEF kr6_arm1_animate RotationXYZ {
+		axis Z
+    angle 0
+	}
+
+  # Arm 2 #######################################################
+  Separator {
+    RotationXYZ {
+      axis X
+      angle 1.5707963267948966
+    }
+
+    Translation{
+      translation -300 0 -675
+    }
+
+    DEF kr6_arm2 File {
+      name "kr6_arm2.iv"
+
+    }
+  }  
+
+  # DH Translation
+  Translation{
+    translation 650 0 0
+  }
+
+  RotationXYZ {
+		axis Z
+    angle -1.5707963267948966
+	}
+
+  # Animation
+  DEF kr6_arm2_animate RotationXYZ {
+		axis Z
+    angle 0
+	}
+
+  # Arm 3 #######################################################
+  Separator {
+    RotationXYZ {
+      axis X
+      angle 1.5707963267948966
+    }
+
+    RotationXYZ {
+      axis Y
+      angle 1.5707963267948966
+    }
+
+    Translation{
+      translation -950 0 -675
+    }
+
+    File {
+      name "kr6_arm3.iv"
+
+    }
+  }  
+
+  # DH Translation
+  RotationXYZ {
+		axis X
+    angle 1.5707963267948966
+	}
+
+  Translation{
+    translation 155 0 0
+  }
+
+  Translation{
+    translation 0 0 -600
+  }
+
+  # Animation
+  DEF kr6_arm3_animate RotationXYZ {
+		axis Z
+    angle 0
+	}
+
+  # Arm 4 #######################################################
+  Separator {
+    RotationXYZ {
+      axis Y
+      angle 1.5707963267948966
+    }
+
+    Translation{
+      translation -1550 0 -830
+    }
+
+    File {
+      name "kr6_arm4.iv"
+
+    }
+  }  
+
+  # DH Translation
+  RotationXYZ {
+		axis X
+    angle -1.5707963267948966
+	}
+
+  # Animation
+  DEF kr6_arm4_animate RotationXYZ {
+		axis Z
+    angle 0
+	}
+
+  # Arm 5 #######################################################
+  Separator {
+    RotationXYZ {
+      axis X
+      angle 1.5707963267948966
+    }
+
+    RotationXYZ {
+      axis Y
+      angle 1.5707963267948966
+    }
+
+    Translation{
+      translation -1550 0 -830
+    }
+
+    File {
+      name "kr6_arm5.iv"
+
+    }
+  }  
+
+  # DH Translation
+  RotationXYZ {
+		axis X
+    angle -1.5707963267948966
+	}
+
+  Translation{
+    translation 0 0 100
+  }
+
+  # Animation
+  DEF kr6_arm5_animate RotationXYZ {
+		axis Z
+    angle 0
+	}
+
+  # Arm 6 #######################################################
+  Separator {
+    RotationXYZ {
+      axis Y
+      angle -1.5707963267948966
+    }
+
+    Translation{
+      translation -1650 0 -830
+    }
+
+    File {
+      name "kr6_arm6.iv"
+
+    }
+  }
+
+  # Tool center point on the flange face (25 mm in front of DH frame 6),
+  # gripped puzzle pieces are attached here
+  Translation{
+    translation 0 0 25
+  }
+}

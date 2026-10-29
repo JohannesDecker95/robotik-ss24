@@ -1,0 +1,47 @@
+{
+    "name": "ROS 2 Development Container for Linux",
+    "privileged": true,
+    "remoteUser": "vscode",
+    "workspaceFolder": "/home/vscode/workspace",
+    "build": {
+        "dockerfile": "../Dockerfile"
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/workspace,type=bind",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools-themes",
+                "twxs.cmake",
+                "donjayamanne.python-extension-pack",
+                "ms-iot.vscode-ros",
+                "ms-vscode.cpptools",
+                "ms-python.python",
+                "GitLab.gitlab-workflow",
+                "mhutchie.git-graph",
+                "eamodio.gitlens",
+                "GitHub.copilot",
+                "tal7aouy.rainbow-bracket",
+                "oderwat.indent-rainbow",
+                "ms-vscode.cpptools-extension-pack",
+                "mhutchie.git-graph",
+                "seatonjiang.gitmoji-vscode",
+                "bierner.markdown-mermaid",
+                "tomoki1207.pdf",
+                "ms-vscode.cmake-tools",
+                "llvm-vs-code-extensions.vscode-clangd",
+                "MS-vsliveshare.vsliveshare"
+            ]
+        }
+    },
+    "containerEnv": {
+        "DISPLAY": "unix:0",
+        "ROS_AUTOMATIC_DISCOVERY_RANGE": "LOCALHOST",
+        "ROS_DOMAIN_ID": "42"
+    },
+    "runArgs": [
+        "--net=host",
+        "-e",
+        "DISPLAY=${env:DISPLAY}"
+    ],
+    "postCreateCommand": "$HOME/workspace/.devcontainer/scripts/post_setup.sh"
+}

@@ -1,0 +1,96 @@
+\subsection[Testing]{Testing \myAuthor{Simon Mederer}}
+Um unabhängig von den anderen Teams das Verhalten der Control-Node testen zu können, wurde ein Testing Framework entwickelt, in dem sowohl für die Solver-, als auch für die  Visualisierungs Node ein sogenanntes Mockup erstellt wurde. Diese sollen das Verhalten der jeweiligen Node simulieren um somit das Verhalten der Control Node im finalen System besser einschätzen und testen zu können. Abbildung \ref{fig:test_node_architektur} visualisiert hier wie die Mockups in die Architetkur eingebunden werden. Diese subscriben bzw. publishen auf die Topics ihrer jeweiligen Originale um so ihre Interaktion mit der Control Node simulieren zu können.   
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\textwidth]{TestSetup.png}
+    \caption{Test Node Architektur}
+    \label{fig:test_node_architektur}
+\end{figure}
+
+Zusätzlich wurde eine GitLab CI/CD erstellt um automatisch Unit-Tests in der Control Node ausführen zu können. 
+
+\subsubsection{Test Package}
+Die Test Node besteht aus zwei Mockups. Dem \textit{SolverMock} und dem \textit{VisualizeMock}, welche jeweils in einer eigenen ROS-Node realisiert wurden. 
+
+\subparagraph{SolverMock}
+Die Hauptaufgabe, des SolverMocks ist es der Control Node Strecken zu publishen, welche durch Start- und Endpunkt definiert sind. Diese werden in einer eigenen Funktion \textit{generate\_pose\_array\_message} erstellt. Dabei wird in erster Iteration folgende Strecke erstellt. 
+\[ 
+startPos: 
+    \begin{cases} 
+    position: 
+    \begin{cases}
+    x = 0.5 \\
+    y = 0.5 \\
+    z = 0 \\
+    \end{cases}\\
+    orientation: 
+    \begin{cases}
+    x = cos(\pi{}) \\
+    y = 0 \\
+    z = 0 \\
+    w = sin(\pi{}) \\
+    \end{cases}
+    \end{cases}
+    \Rightarrow 
+endPos: 
+    \begin{cases} 
+    position: 
+    \begin{cases}
+    x = -0.5 \\
+    y = -0.5 \\
+    z = 0 \\
+    \end{cases}\\
+    orientation: 
+    \begin{cases}
+    x = cos(\pi{}) \\
+    y = 0 \\
+    z = 0 \\
+    w = sin(\pi{}) \\
+    \end{cases}
+    \end{cases}
+\]
+
+Diese beiden Punkte werden in die PoseArray Nachricht gepackt und an das \textit{NEXTPIECE} Topic gepublished. Auf dieses subscribed wie im normalen Betrieb die Control Node und kann aus den jeweiligen Positionen die Trajektorie berechnen.
+
+\paragraph{VisualizeMock}
+Um die berechneten Daten zu visualisieren bzw. zu validieren ist eine zweite Node notwendig, welche die Daten, die von der Contol Node versendet werden evaluiert. Wie in Abbildung \ref{fig:test_node_architektur} dargestellt subscribed der \textit{VisualizeMock} auf die beiden Topics \textit{ANGLES} und \textit{PUZBOOL}. Über diese beiden Topics kann alles, was die Control Node ausgibt durch die \textit{VisualizeMock} Node empfangen und ausgewertet werden. Dies soll durch UnitTests realisiert werden.   
+
+\subsubsection{Unit Tests}
+Unit Tests sind Tests, mit denen normalerweise einzelne Programmkomponenten getestet werden. Die beiden implementierten Komponenten \textit{SolverMock} und \textit{VisualizeMock} erlauben es jedoch das gesamte Verhalten der Contol Node zu testen. Hierfür kann das von ROS zur Verfügung gestellte Unit Testing Framework, genauer GoogleTest (gtest) genutzt werden. Gtest ist ein assertion basiertes, plattformunabhägiges C++ Testing Framework, mithilfe dessen einzelne Komponenten einer Software getestet werden können. 
+
+In erster Iteration war geplant, dass die beiden Mockups auf den Watchdog der Control Node subscriben um eine simultane Ausführung beider Knoten zu gewährleisten. Dies wurde dadurch realisiert, dass beide einem Executor übergeben wurden, welcher in einem separaten Thread gestarted wird. Wenn nun die Watchdog Nachricht der Contol Node empfangen wird, kann dies nun über das Testing Framework ermittelt werden. 
+Der erste Test wird als erfolgreich angesehen, wenn beide Knoten die Watchdog Nachricht der Control Node empfangen haben. 
+
+Ein weiterer Test, der jedoch aus Zeitgründen nicht mehr implementiert wurde, sollte die konkreten Nachrichten der Control Node validieren. Dabei sollte eine Nachricht an die Control Node geschickt werden, und daraufhin geprüft werden, ob die Control Node ihre Nachrichten in der richtigen Reihenfolge ausgibt, sprich: 
+\begin{enumerate}
+    \item Angles bis die Startposition erricht ist
+    \item Puzzle-Boolean auf \textbf{true} mit korrekter ID 
+    \item Angles bis die Endposition erreicht ist
+    \item Puzzle-Boolean auf \textbf{false} mit korrekter ID
+\end{enumerate}
+
+Dieser Test wurde jedoch aus Zeitgründen nicht implementiert. 
+
+\subsubsection{CI/CD}
+Um die oben beschriebenen Unit-Tests mit dem GitLab Repository verbinden zu können sollte eine CI/CD-Pipeline erstellt werden, die automatisch die geschriebenen Unit-Tests ausführt und dem jeweiligen Entwickler Feedback darüber gibt, ob die grundsätzliche Funktionalität der Control Node nach dem Pushen seiner Änderungen noch gegeben ist. Dafür bietet GitLab eine komfortable Umgebung an innerhalb derer die CI/CD erstellt werden kann. 
+
+Als Runner wird der bereits für das Docker-Image erstellte Runner verwendet.  
+
+Folgende Schritte sollten in der Pipeline ausgeführt werden.
+
+\begin{enumerate}
+    \item Clonen des Repositorys
+    \item Installieren der notwendigen Dependencies (Roboricstoolbox, Numpy)
+    \item Initialisieren der Subrepositories
+    \item Bauen des Repositories
+    \item Ausführen der Tests
+\end{enumerate}
+
+Im Laufe der Enwticklung stellten sich der 5. Schritt als größte Herausforderung dar, da trotz korrekter Initialisierung und doppelter Validierung der korrekten Versionen das Importieren von Modulen in einer Python-Library fehlschlägt, weshalb dieser aus Zeitgründen weggelassen wurde. Folglich wird durch die Pipeline lediglich abgedeckt, ob das Repository nach dem Pushen von Änderungen noch gebaut werden kann oder nicht. 
+\\
+
+\subsubsection[Schnittstellen]{Schnittstellen \myAuthor{Sami Hamza, Chiara Piccolroaz, Pascal Severin}}
+
+Zum Testen der Schnittstellen der Control-Node wurden ROS-launch files angelegt. Diese ermöglichen ein händisches Testen einzelner Komponenten.
+\\

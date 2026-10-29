@@ -1,0 +1,34 @@
+#Inventor V2.0 ascii
+Separator {
+	Material {
+		diffuseColor  1.0 0.0 0.0
+		}
+	Separator {
+		Translation {
+			translation 450 0 0 
+		}
+		Cube { width 900 }
+	}
+	Material {
+		diffuseColor  0.0 1.0 0.0
+		}
+	Separator {
+		Translation {
+			translation 0 450 0 
+		}
+	Cube { height 900 }
+	}
+	Material {
+		diffuseColor  0.0 0.0 1.0
+		}
+	Separator {
+		Translation {
+			translation 0 0 450 
+		}
+	Cube { depth 900 }
+	}
+	Transform {
+		translation 450 0 0
+		}
+#	Sphere { radius 10 }
+}

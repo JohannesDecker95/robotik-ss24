@@ -1,0 +1,34 @@
+\section[Master Node]{Master Node \myAuthor{Simon Mederer}}
+Um einen zentralen Start und Stop aller Nodes mittels einer eigenen GUI zu realisieren wurde eine sogenannte Master Node entwickelt.
+
+\subsection{Grundidee}
+Die Grundidee ist, dass der Start des gesamten Systems über eine Zentrale Node synchronisiert wird, bzw. der aktuelle Zustand der einzelnen Komponenten dem Nutzer über eine grafische Benutzeroberfläche zugänglich gemacht wird. Dazu wurde für alle relevanten Nodes zum einen eine Startuproutine entwickelt und ein Watchdog, welcher den Ausfall der jeweiligen komponente signalisiert, integriert. Zudem soll, beim Ausfall einer Node der Nutzer die Möglichkeit haben alle Nodes zu stoppen. Die dabei resultierende Architektur ist unter Abbildung \ref{fig:master_architecutre} zu sehen. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\textwidth]{master_node_topic_layout.png}
+    \caption{Master Node Architektur}
+    \label{fig:master_architecutre}
+\end{figure}
+
+Der geplante Ablauf ist folgender. Zu Beginn werden alle Nodes über ein Launch-File gestartet, darunter auch die Master Node, woraufhin alle Nodes auf das Startsignal des Masters warten. Ist dieses geschickt beginnen alle Nodes gleichzeitig mit ihren jeweiligen Aufgaben. 
+
+Wenn der Master das Stop Signal sendet, werden alle Nodes abgebrochen. 
+
+\subsection{User Interface}
+Um den Status aller Nodes zu visualisieren wurde eine graphische Benutzeroberfläche mithilfe des QT5 Frameworks erstellt. Diese ist in Abbildung \ref{fig:master_gui} abgebildet. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\textwidth]{Screenshot GUI.png}
+    \caption{Master GUI}
+    \label{fig:master_gui}
+\end{figure}
+
+Dieses besteht aus 4 Labels und 4 Anzeigen, die den aktuellen Status jeder Node visualisieren, wie sie durch die \textit{Watchdog Node}, beschrieben in \ref{sec:watchdog_node}, ermittelt werden. Zudem sind zwei Buttons in die Oberfläche integriert, ein \textbf{Start} und ein\textbf{Stop} Button, die jeweils den gesamten Vorgang starten oder stoppen. Der Start Button kann zudem erst gedrückt werden, wenn alle Nodes stabil laufen.  
+ 
+\subsection{Watchdog}
+\label{sec:watchdog_node}
+Die Logik des Masters ist in der Watchdog Node realisert, welche eine ROS2 Node ist. Diese besteht aus vier Subscribern, eine für jede Komponente und einem Publisher, der für die Start und Stop Befehle verantwortlich ist. Zusätzlich wurde ein Timer integriert, der zyklisch den Status aller Nodes ermittelt und die Zeit speichert wann das letzte Lebenszeichen der Node gekommen ist. Ist dieser Zeitpunkt mehr als 5 Sekunden vergangen, wird die Node als ausgefallen betrachtet und dies der GUI weitergegeben. 
+
+Damit der Master sinnvolle Daten erhält muss in jede Node ein Watchdogmodul integriert, welches jede Sekunde \textit{True} published um dem Master zu signalisieren, dass diese noch planmäßig läuft. 
